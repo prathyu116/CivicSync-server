@@ -1,4 +1,3 @@
-// src/models/user.model.ts
 import mongoose, { Schema, Model } from 'mongoose';
 import { IUser } from '../types/models.types';
 
@@ -27,9 +26,6 @@ const UserSchema: Schema<IUser> = new Schema({
     default: Date.now,
   },
 });
-
-// Add pre-save hook for password hashing if needed elsewhere (e.g., password update)
-// UserSchema.pre<IUser>('save', async function(next) { ... });
 
 const User: Model<IUser> = mongoose.model<IUser>('User', UserSchema);
 

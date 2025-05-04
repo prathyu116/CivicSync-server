@@ -1,4 +1,3 @@
-// src/models/issue.model.ts
 import mongoose, { Schema, Model } from 'mongoose';
 import { IIssue } from '../types/models.types';
 

@@ -1,8 +1,7 @@
-// src/types/express/index.d.ts
 declare namespace Express {
     export interface Request {
       user?: {
-        id: string; // Assuming your JWT payload structure
+        id: string; 
       };
     }
   }

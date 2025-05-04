@@ -1,8 +1,6 @@
-// src/routes/user.routes.ts
 import { Router } from 'express';
-import { getMyIssues } from '../controllers/issue.controller'; // Keep controller logic there for now
+import { getMyIssues } from '../controllers/issue.controller'; 
 import { authMiddleware } from '../middleware/auth.middleware';
-// import { authMiddleware } from '../middleware/auth.middleware';
 
 const router = Router();
 

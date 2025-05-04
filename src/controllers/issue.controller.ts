@@ -1,13 +1,12 @@
-// src/controllers/issue.controller.ts
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import Issue from '../models/issue.model';
-import User from '../models/user.model'; // Import User model for the vote update
+import User from '../models/user.model'; 
 
 export const createIssue = async (req: Request, res: Response): Promise<any> => {
   try {
     const { title, description, category, location, imageUrl } = req.body;
-    const userId = req.user?.id; // From authMiddleware
+    const userId = req.user?.id; 
 
     if (!userId) {
       return res.status(401).json({ message: 'User not authenticated' });
@@ -27,8 +26,7 @@ export const createIssue = async (req: Request, res: Response): Promise<any> => 
     });
 
     const savedIssue = await newIssue.save();
-    // Populate createdBy for the response
-    const populatedIssue = await savedIssue.populate('createdBy', 'name email'); // Send name and email
+    const populatedIssue = await savedIssue.populate('createdBy', 'name email');
 
     return res.status(201).json(populatedIssue);
   } catch (error: any) {
@@ -59,7 +57,7 @@ export const getAllIssues = async (req: Request, res: Response): Promise<any> =>
 
     const [items, total] = await Promise.all([
       Issue.find(query)
-        .populate('createdBy', 'name') // Only populate name for list view
+        .populate('createdBy', 'name') 
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit),
@@ -89,7 +87,7 @@ export const getIssueById = async (req: Request, res: Response): Promise<any> =>
         return res.status(400).json({ message: 'Invalid Issue ID format' });
     }
 
-    const issue = await Issue.findById(issueId).populate('createdBy', 'name email'); // Populate name and email for detail view
+    const issue = await Issue.findById(issueId).populate('createdBy', 'name email'); 
 
     if (!issue) {
       return res.status(404).json({ message: 'Issue not found' });
@@ -135,7 +133,6 @@ export const updateIssue = async (req: Request, res: Response): Promise<any> => 
     issue.title = title ?? issue.title;
     issue.description = description ?? issue.description;
     issue.category = category ?? issue.category;
-    // Ensure location update contains lat/lng if provided
     if (location && (location.lat !== undefined || location.lng !== undefined)) {
          issue.location.lat = location.lat ?? issue.location.lat;
          issue.location.lng = location.lng ?? issue.location.lng;
@@ -231,17 +228,14 @@ export const deleteIssue = async (req: Request, res: Response): Promise<any> => 
       return res.status(403).json({ message: 'Access denied: You cannot delete this issue' });
     }
 
-     // Business Logic: Only allow deletion if status is 'Pending'
     if (issue.status !== 'Pending') {
        return res.status(400).json({ message: `Cannot delete issue: Status is currently '${issue.status}'` });
     }
 
-    // Use deleteOne for potential middleware hooks if any were added
     await issue.deleteOne();
 
-    // TODO: Consider removing the issue ID from users' 'votes' array if deleted?
 
-    return res.status(200).json({ message: 'Issue deleted successfully' }); // Send 200 or 204 No Content
+    return res.status(200).json({ message: 'Issue deleted successfully' }); 
   } catch (error: any) {
     console.error('Delete issue error:', error.message);
     return res.status(500).json({ message: 'Server error deleting issue' });
@@ -261,17 +255,15 @@ export const voteForIssue = async (req: Request, res: Response): Promise<any> =>
     }
 
     const issue = await Issue.findById(issueId);
-    const user = await User.findById(userId); // Need user to update their votes
+    const user = await User.findById(userId); 
 
     if (!issue) {
       return res.status(404).json({ message: 'Issue not found' });
     }
      if (!user) {
-        // Should not happen if authMiddleware worked, but good check
       return res.status(404).json({ message: 'Voting user not found' });
     }
 
-    // Check if user already voted (check both Issue and User docs for robustness)
     const issueAlreadyVoted = issue.votedBy.some(voterId => voterId.equals(userId));
     const userAlreadyVoted = user.votes.some(votedIssueId => votedIssueId.equals(issueId));
 
@@ -279,8 +271,6 @@ export const voteForIssue = async (req: Request, res: Response): Promise<any> =>
       return res.status(400).json({ message: 'You have already voted for this issue' });
     }
 
-    // Atomicity concern: ideally use transactions for multi-doc updates
-    // Simple approach (can lead to inconsistencies on failure):
     issue.votes += 1;
     issue.votedBy.push(new mongoose.Types.ObjectId(userId));
     await issue.save();
@@ -288,7 +278,7 @@ export const voteForIssue = async (req: Request, res: Response): Promise<any> =>
     user.votes.push(new mongoose.Types.ObjectId(issueId));
     await user.save();
 
-    await issue.populate('createdBy', 'name email'); // Repopulate after save
+    await issue.populate('createdBy', 'name email'); 
 
     return res.json(issue);
   } catch (error: any) {
@@ -305,7 +295,7 @@ export const getMyIssues = async (req: Request, res: Response): Promise<any> => 
     }
 
     const issues = await Issue.find({ createdBy: userId })
-      .populate('createdBy', 'name') // Only need name for "My Issues" list usually
+      .populate('createdBy', 'name') 
       .sort({ createdAt: -1 });
 
     return res.json(issues);

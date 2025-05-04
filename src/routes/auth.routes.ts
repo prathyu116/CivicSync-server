@@ -1,4 +1,3 @@
-// src/routes/auth.routes.ts
 import { Router } from 'express';
 import { registerUser, loginUser, getUserProfile } from '../controllers/auth.controller';
 import { authMiddleware } from '../middleware/auth.middleware';

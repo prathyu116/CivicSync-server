@@ -1,4 +1,3 @@
-// src/controllers/auth.controller.ts
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import User from '../models/user.model';
@@ -30,12 +29,11 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
     user = new User({
       name,
       email,
-      password: hashedPassword, // Save hashed password
+      password: hashedPassword, 
     });
 
     await user.save();
 
-    // Don't send password back, even hashed
     const userResponse = user.toObject();
     delete userResponse.password;
 
@@ -52,7 +50,6 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 };
 
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
-  console.log("hloooooooooo")
   try {
     const { email, password } = req.body;
 
@@ -61,15 +58,13 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         return
     }
 
-    // Explicitly select password for comparison
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
-       res.status(400).json({ message: 'Invalid credentials' }); // Use generic message
+       res.status(400).json({ message: 'Invalid credentials' }); 
        return
     }
 
     // Validate password
-    // user.password will be defined because we used .select('+password')
     const isMatch = await bcrypt.compare(password, user.password!);
     if (!isMatch) {
        res.status(400).json({ message: 'Invalid credentials' });
@@ -78,7 +73,6 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
     const token = signToken(user.id);
 
-    // Prepare user object for response (without password)
     const userResponse = user.toObject();
     delete userResponse.password;
 
@@ -94,15 +88,13 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
 export const getUserProfile = async (req: Request, res: Response): Promise<void> => {
   try {
-    // req.user is attached by authMiddleware
     if (!req.user?.id) {
-         res.status(401).json({ message: 'Not authorized' }); // Should not happen if middleware is correct
+         res.status(401).json({ message: 'Not authorized' }); 
          return
     }
 
-    const user = await User.findById(req.user.id); // Default selection excludes password
+    const user = await User.findById(req.user.id); 
     if (!user) {
-      // This case might mean the user was deleted after token issuance
        res.status(404).json({ message: 'User not found' });
       return
     }

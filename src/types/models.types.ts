@@ -1,10 +1,9 @@
-// src/types/models.types.ts
 import { Document, Types } from 'mongoose';
 
 export interface IUser extends Document {
   name: string;
   email: string;
-  password?: string; // Optional on retrieval if selecting '-password'
+  password?: string; 
   votes: Types.ObjectId[];
   createdAt: Date;
 }
@@ -18,10 +17,10 @@ export interface IIssue extends Document {
     lng: number;
     address?: string;
   };
-  imageUrl?: string | null; // Allow null
+  imageUrl?: string | null;
   status: 'Pending' | 'In Progress' | 'Resolved';
   votes: number;
   votedBy: Types.ObjectId[];
-  createdBy: Types.ObjectId | IUser; // Can be populated
+  createdBy: Types.ObjectId | IUser; 
   createdAt: Date;
 }
