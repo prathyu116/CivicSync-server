@@ -1,5 +1,5 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
-import cors from 'cors';
+import cors, { CorsOptions } from 'cors'; 
 import dotenv from 'dotenv';
 import connectDB from './config/db';
 import authRoutes from './routes/auth.routes';
@@ -12,8 +12,25 @@ connectDB();
 
 const app: Express = express();
 
+// --- CORS Configuration ---
+const clientURL = process.env.CLIENT_URL;
+const corsOptions: CorsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || origin === clientURL) {
+      callback(null, true); // Allow
+    } else {
+      console.error(`CORS Error: Request from origin ${origin} blocked.`);
+      callback(new Error(`Origin ${origin} not allowed by CORS`)); // Deny
+    }
+  },
+  credentials: true, 
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], 
+  allowedHeaders: ['Content-Type', 'Authorization'], 
+};
 
-app.use(cors()); 
+// Apply CORS middleware BEFORE your routes
+app.use(cors(corsOptions));
+// --- End CORS Configuration ---
 app.use(express.json());
 app.use(express.urlencoded({ extended: false })); 
 
@@ -27,7 +44,6 @@ app.use('/api/issues', issueRoutes);
 app.use('/api/users', userRoutes); 
 
 // --- Error Handling Middleware ---
-// 404 Handler (Not Found) - Place after all routes
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.status(404).json({ message: `Not Found - ${req.originalUrl}` });
 });
