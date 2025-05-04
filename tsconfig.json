@@ -1,0 +1,21 @@
+// tsconfig.json
+{
+    "compilerOptions": {
+      "target": "ES2016", // Or newer
+      "module": "CommonJS",
+      "outDir": "./dist",
+      "rootDir": "./src",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      "moduleResolution": "node",
+       "resolveJsonModule": true, // Important for importing JSON potentially
+      "baseUrl": "./", // Allows absolute paths from root
+       "paths": {
+         "@/*": ["src/*"] // Optional: Alias for cleaner imports
+       }
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "**/*.spec.ts"]
+  }
