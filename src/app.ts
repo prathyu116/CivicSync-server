@@ -28,9 +28,7 @@ const corsOptions: CorsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'], 
 };
 
-// Apply CORS middleware BEFORE your routes
 app.use(cors(corsOptions));
-// --- End CORS Configuration ---
 app.use(express.json());
 app.use(express.urlencoded({ extended: false })); 
 
